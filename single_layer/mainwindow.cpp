@@ -28,14 +28,29 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
   tempList.append(tempPoint);
   pointList.append(myPoint);
 
-  ui->label->setNum(tempPoint.x);
+  ui->label_3->setNum(tempPoint.x);
   ui->label_2->setNum(tempPoint.y);
 
   update();
 }
 
+void MainWindow::clearBoard()
+{
+  tempList.clear();
+  pointList.clear();
+  normalizeList.clear();
+}
+
 int sgn(double value){
   return value > 0 ? 1 : -1 ;
+}
+
+double tanh(double value){
+  return ((2 / (1 + exp(-value))) - 1);
+}
+
+double derivationTanh(double output){
+  return 0.5 * (1 - pow(output, 2));;
 }
 
 void MainWindow::Perceptron()
@@ -69,6 +84,77 @@ void MainWindow::Perceptron()
   update();
 }
 
+void MainWindow::Delta()
+{
+
+  if(ui->checkBox->checkState()){
+      double meanX = 0 , meanY = 0;
+
+      for (MyPoint i: tempList) {
+          meanX += i.x;
+          meanY += i.y;
+      }
+
+      meanX /= tempList.size();
+      meanY /= tempList.size();
+
+      double differentiationX = 0 , differentiationY = 0;
+
+      for (MyPoint i : tempList){
+          differentiationX += pow((meanX - i.x) , 2);
+          differentiationY += pow((meanY - i.y) , 2);
+      }
+
+      double varianceX = sqrt(differentiationX / tempList.size());
+      double varianceY = sqrt(differentiationY / tempList.size());
+
+      MyPoint tempPoint;
+
+      for (MyPoint i : tempList) {
+          tempPoint = i;
+          tempPoint.x = (i.x - meanX) / varianceX;
+          tempPoint.y = (i.y - meanX) / varianceY;
+          normalizeList.append(tempPoint);
+        }
+  }
+
+  double learningConstant = 0.1;
+  double bias = 1;
+  double net = 0;
+  int desiredValue = 0 ;
+  double output = 0;
+  double derivationOutput = 0;
+  double error = 0.5;
+
+  while(error > 0.1){
+    error = 0;
+    for(MyPoint i : normalizeList){
+
+       net = w[0]*i.x + w[1]*i.y + w[2]*bias;
+
+       output = tanh(net);
+       derivationOutput = derivationTanh(output);
+
+       if(i.pointColor == Qt::red){
+          desiredValue = 1;
+       }else{
+          desiredValue = -1;
+       }
+
+       //eğer desiredvalue ile output aynı ise 0 çıktısını verecek ve ağırlıklar değişmeyecek
+
+        w[0] += learningConstant *(desiredValue - output) * i.x * derivationOutput;
+        w[1] += learningConstant *(desiredValue - output) * i.y * derivationOutput;
+        w[2] += learningConstant *(desiredValue - output) * bias * derivationOutput;
+
+        error += 0.5 * pow((desiredValue - output) , 2);
+    }
+  }
+
+  update();
+}
+
+
 void MainWindow::paintEvent(QPaintEvent * event)
 {
   QPen paintpen(Qt::black);
@@ -78,12 +164,13 @@ void MainWindow::paintEvent(QPaintEvent * event)
 
   for (MyPoint i : pointList) {
       QPoint p1;
-      p1.setX(i.x);
-      p1.setY(i.y);
+      p1.setX((int)i.x);
+      p1.setY((int)i.y);
       paintpen.setColor(i.pointColor);
       painter.setPen(paintpen);
       painter.drawPoint(p1);
     }
+
   paintpen.setColor(Qt::black);
   paintpen.setWidth(2);
   painter.setPen(paintpen);
@@ -91,7 +178,6 @@ void MainWindow::paintEvent(QPaintEvent * event)
   painter.drawLine(QLine(window()->width()/2 , 0 , window()->width()/2 , window()->height()));
 
   MyPoint firstPoint , secondPoint;
-  bool flag = false;
 
   firstPoint.x = -window()->width()/2;
   firstPoint.y = -(w[0] * firstPoint.x + w[2]) / w[1];
@@ -107,13 +193,14 @@ void MainWindow::paintEvent(QPaintEvent * event)
 
   paintpen.setColor(Qt::blue);
   painter.setPen(paintpen);
-  painter.drawLine(QLine(firstPoint.x , firstPoint.y , secondPoint.x , secondPoint.y));
+  painter.drawLine(QLine((int)firstPoint.x , (int)firstPoint.y , (int)secondPoint.x , (int)secondPoint.y));
 
-  ui->label_5 ->setNum(w[0]);
-  ui->label_6 ->setNum(w[1]);
-  ui->label_7 ->setNum(w[2]);
+  ui->label_4 ->setNum(w[0]);
+  ui->label_8 ->setNum(w[1]);
+  ui->label_9 ->setNum(w[2]);
 
 }
+
 
 MainWindow::~MainWindow()
 {
@@ -139,3 +226,24 @@ void MainWindow::on_pushButton_clicked()
 
 
 
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    clearBoard();
+    update();
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+   Delta();
+}
+
+void MainWindow::on_redButton_2_clicked()
+{
+    currentColor = Qt::red;
+}
+
+void MainWindow::on_greenButton_2_clicked()
+{
+    currentColor = Qt::green;
+}

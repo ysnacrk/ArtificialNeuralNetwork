@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include<QPaintEvent>
+#include <QPaintEvent>
 #include <math.h>
 
 QT_BEGIN_NAMESPACE
@@ -11,8 +11,8 @@ QT_END_NAMESPACE
 
 
 struct MyPoint{
-  int x;
-  int y;
+  double x;
+  double y;
   QColor pointColor;
 };
 
@@ -24,15 +24,21 @@ public:
 
   QList<MyPoint> pointList;
   QList<MyPoint> tempList;
+  QList<MyPoint> normalizeList;
+
   QColor currentColor;
 
-  double w[3] = {1, 1 , 0};
+  double w[3] = {2, 2 ,-1};
   bool isPerceptronDone;
   MainWindow(QWidget *parent = nullptr);
 
   virtual void paintEvent(QPaintEvent * event);
   void mousePressEvent(QMouseEvent * event);
+
+  void clearBoard();
   void Perceptron();
+  void Delta();
+
   ~MainWindow();
 
 private slots:
@@ -42,6 +48,14 @@ private slots:
   void on_greenButton_clicked();
 
   void on_pushButton_clicked();
+
+  void on_pushButton_2_clicked();
+
+  void on_pushButton_3_clicked();
+
+  void on_redButton_2_clicked();
+
+  void on_greenButton_2_clicked();
 
 private:
   Ui::MainWindow *ui;
