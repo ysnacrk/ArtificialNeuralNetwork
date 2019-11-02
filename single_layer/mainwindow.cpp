@@ -46,11 +46,11 @@ int sgn(double value){
 }
 
 double tanh(double value){
-  return ((2 / (1 + exp(-value))) - 1);
+  return (2 / (1 +  exp(-value * 2))) - 1;
 }
 
-double derivationTanh(double output){
-  return 0.5 * (1 - pow(output, 2));;
+double derivationTanh(double value){
+  return 0.5* (1 - pow(value , 2));
 }
 
 void MainWindow::Perceptron()
@@ -114,6 +114,7 @@ void MainWindow::Delta()
           tempPoint = i;
           tempPoint.x = (i.x - meanX) / varianceX;
           tempPoint.y = (i.y - meanX) / varianceY;
+          tempPoint.pointColor = i.pointColor;
           normalizeList.append(tempPoint);
         }
   }
@@ -132,8 +133,8 @@ void MainWindow::Delta()
 
        net = w[0]*i.x + w[1]*i.y + w[2]*bias;
 
-       output = tanh(net);
-       derivationOutput = derivationTanh(output);
+       output =((2 / (1 + exp(-net))) - 1);
+       derivationOutput = 0.5 * (1 - pow(output, 2));
 
        if(i.pointColor == Qt::red){
           desiredValue = 1;
@@ -151,6 +152,17 @@ void MainWindow::Delta()
     }
   }
 
+  pointList.clear();
+  for(MyPoint i : normalizeList){
+
+      //bir koordinat işlemleri
+      MyPoint temp;
+      temp.x = i.x*20+ window()->width()/2;
+      temp.y = window()->height()/2 - i.y*20;
+      temp.pointColor = i.pointColor;
+      pointList.append(temp);
+    }
+  normalizeList.clear();
   update();
 }
 
@@ -162,6 +174,9 @@ void MainWindow::paintEvent(QPaintEvent * event)
   paintpen.setWidth(6);
   painter.setPen(paintpen);
 
+   if(ui->checkBox->checkState()){
+
+     }
   for (MyPoint i : pointList) {
       QPoint p1;
       p1.setX((int)i.x);
@@ -180,10 +195,10 @@ void MainWindow::paintEvent(QPaintEvent * event)
   MyPoint firstPoint , secondPoint;
 
   firstPoint.x = -window()->width()/2;
-  firstPoint.y = -(w[0] * firstPoint.x + w[2]) / w[1];
+  firstPoint.y = -(w[0] * firstPoint.x + w[2]*20) / w[1];
 
   secondPoint.x = window()->width()/2;
-  secondPoint.y = -(w[0] * secondPoint.x + w[2]) / w[1];
+  secondPoint.y = -(w[0] * secondPoint.x + w[2]*20) / w[1];
 
   firstPoint.x += window()->width()/2;
   firstPoint.y = window()->height()/2 - firstPoint.y;
