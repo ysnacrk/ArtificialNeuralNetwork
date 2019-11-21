@@ -157,8 +157,8 @@ void MainWindow::Delta()
 
       //bir koordinat işlemleri
       MyPoint temp;
-      temp.x = i.x*20+ window()->width()/2;
-      temp.y = window()->height()/2 - i.y*20;
+      temp.x = i.x*100+ window()->width()/2;
+      temp.y = window()->height()/2 - i.y*100;
       temp.pointColor = i.pointColor;
       pointList.append(temp);
     }
@@ -173,10 +173,7 @@ void MainWindow::paintEvent(QPaintEvent * event)
   QPainter painter(this);
   paintpen.setWidth(6);
   painter.setPen(paintpen);
-
-   if(ui->checkBox->checkState()){
-
-     }
+  int expand = 1;
   for (MyPoint i : pointList) {
       QPoint p1;
       p1.setX((int)i.x);
@@ -192,13 +189,16 @@ void MainWindow::paintEvent(QPaintEvent * event)
   painter.drawLine(QLine(0 , window()->height()/2 , window()->width() , window()->height()/2));
   painter.drawLine(QLine(window()->width()/2 , 0 , window()->width()/2 , window()->height()));
 
+  if(ui->checkBox->checkState()){
+      expand = 100;
+    }
   MyPoint firstPoint , secondPoint;
 
   firstPoint.x = -window()->width()/2;
-  firstPoint.y = -(w[0] * firstPoint.x + w[2]*20) / w[1];
+  firstPoint.y = -(w[0] * firstPoint.x + w[2]*expand) / w[1];
 
   secondPoint.x = window()->width()/2;
-  secondPoint.y = -(w[0] * secondPoint.x + w[2]*20) / w[1];
+  secondPoint.y = -(w[0] * secondPoint.x + w[2]*expand) / w[1];
 
   firstPoint.x += window()->width()/2;
   firstPoint.y = window()->height()/2 - firstPoint.y;
@@ -237,10 +237,6 @@ void MainWindow::on_pushButton_clicked()
 {
     Perceptron();
 }
-
-
-
-
 
 void MainWindow::on_pushButton_2_clicked()
 {
