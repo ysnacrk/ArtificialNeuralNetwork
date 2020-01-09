@@ -133,7 +133,7 @@ void MainWindow::Delta()
       for (MyPoint i : tempList) {
           tempPoint = i;
           tempPoint.X = (i.X - meanX) / varianceX;
-          tempPoint.Y = (i.Y - meanX) / varianceY;
+          tempPoint.Y = (i.Y - meanY) / varianceY;
           tempPoint.pointColor = i.pointColor;
           for(int j = 0 ; j < classCount ; j++){
               tempPoint.desiredValue[j] = i.desiredValue[j];
